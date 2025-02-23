@@ -7,8 +7,9 @@ public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
     private Rigidbody2D rb;
+    private Animator animator;
 
-    private int horMov;
+    private float horMov;
     private float horVel = 4.0f;
     private float vertVel = 7f;
     private bool onGround;
@@ -16,6 +17,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -28,16 +30,17 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovementFixed();
+        AnimationFixed();
     }
 
     void Movement() 
     {
-        horMov = (Input.GetKey(KeyCode.LeftArrow) ? -1 : 0) + (Input.GetKey(KeyCode.RightArrow) ? 1 : 0);
-    }
+        horMov = Input.GetAxisRaw("Horizontal");
+        if (horMov != 0)
+            transform.localScale = new Vector3(horMov , 1, 1);
 
-    void MovementFixed()
-    {
-        rb.velocity = new Vector2(horMov * horVel, rb.velocity.y);
+        animator.SetFloat("Horizontal", Math.Abs(horMov * horVel));
+        animator.SetBool("onGround", onGround);
 
         if (Input.GetKey(KeyCode.Space) && onGround)
         {
@@ -46,20 +49,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void AnimationFixed() 
+    {
+        
+    }
+
+    void MovementFixed()
+    {
+        rb.velocity = new Vector2(horMov * horVel, rb.velocity.y);
+        
+    }
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground")) {
             onGround = true;
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            onGround = false;
         }
     }
 
