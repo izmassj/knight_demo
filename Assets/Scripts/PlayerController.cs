@@ -8,8 +8,10 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     private Rigidbody2D rb;
 
-    private int hor_mov;
-    private float hor_vel = 4.0f;
+    private int horMov;
+    private float horVel = 4.0f;
+    private float vertVel = 7f;
+    private bool onGround;
 
     void Start()
     {
@@ -19,7 +21,47 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        hor_mov =  (Input.GetKey(KeyCode.LeftArrow) ? -1 : 0) + (Input.GetKey(KeyCode.RightArrow) ? 1: 0);
-        rb.velocity = new Vector2 (hor_mov * hor_vel, rb.velocity.y);
+        Movement();
+
     }
+
+    private void FixedUpdate()
+    {
+        MovementFixed();
+    }
+
+    void Movement() 
+    {
+        horMov = (Input.GetKey(KeyCode.LeftArrow) ? -1 : 0) + (Input.GetKey(KeyCode.RightArrow) ? 1 : 0);
+    }
+
+    void MovementFixed()
+    {
+        rb.velocity = new Vector2(horMov * horVel, rb.velocity.y);
+
+        if (Input.GetKey(KeyCode.Space) && onGround)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, vertVel);
+            onGround = false; // Prevents double jumping
+        }
+    }
+
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground")) {
+            onGround = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            onGround = false;
+        }
+    }
+
+
 }
